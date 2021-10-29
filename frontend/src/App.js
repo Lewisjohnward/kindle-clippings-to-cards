@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
+import axios from "axios";
 import styled, { createGlobalStyle } from "styled-components";
 import {
   AiOutlineUpload,
@@ -37,7 +38,7 @@ const MainContainer = styled.div`
   height: 500px;
   border-radius: 25px;
   background: white;
-  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.6);
   font-size: 2em;
 `;
 const TitleContainer = styled.div`
@@ -54,10 +55,9 @@ const Title = styled.p`
 `;
 
 const CenterContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 93%;
+  position: absolute;
+  top: 40%;
+  left: 42%;
 `;
 
 const UploadIcon = styled(AiOutlineUpload)`
@@ -72,13 +72,13 @@ const UploadIcon = styled(AiOutlineUpload)`
 
 const ExternalLinkContainer = styled.div`
   position: absolute;
-  right: 2%;
+  bottom: 1%;
+  right: 1%;
   display: flex;
   justify-content: space-around;
   align-items: center;
   width: 10%;
-
-  color: black;
+  color: rgba(0, 0, 0, 0.6);
   cursor: pointer;
 
   & > *:hover {
@@ -93,6 +93,7 @@ const QuestionIcon = styled(AiFillQuestionCircle)`
   top: 5px;
   right: 5px;
   cursor: pointer;
+  color: rgba(0, 0, 0, 0.6);
   &:hover {
     transform: scale(1.05);
   }
@@ -104,12 +105,44 @@ const Input = styled.input.attrs({
   display: none;
 `;
 
+const A = styled.a`
+  display: none;
+`;
+
 const App = () => {
+  const [clippings, setClippings] = useState(null);
+  const [csv, setCsv] = useState(null);
   const inputFile = useRef(null);
+  const downloadFile = useRef(null);
+
+  useEffect(() => {
+    if (clippings) fileUpload(clippings);
+  }, [clippings]);
 
   const onButtonClick = () => {
     // `current` points to the mounted file input element
     inputFile.current.click();
+  };
+
+  const handleFile = (e) => {
+    e.preventDefault();
+    setClippings(e.target.files[0]);
+  };
+
+  const fileUpload = (clippings) => {
+    const url = "http://localhost:5000/upload";
+    const formData = new FormData();
+    formData.append("sampleFile", clippings);
+    const config = {
+      responseType: "blob",
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    };
+    axios.post(url, formData, config).then((res) => {
+      setCsv(URL.createObjectURL(res.data));
+      downloadFile.current.click();
+    });
   };
 
   return (
@@ -123,7 +156,8 @@ const App = () => {
           </TitleContainer>
           <CenterContainer>
             <UploadIcon onClick={onButtonClick} />
-            <Input ref={inputFile} />
+            <Input ref={inputFile} onChange={(e) => handleFile(e)} />
+            <A href={csv ? csv : "#"} download="sheet.csv" ref={downloadFile} />
           </CenterContainer>
           <ExternalLinkContainer>
             <GithubIcon />
