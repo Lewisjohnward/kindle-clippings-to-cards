@@ -57,11 +57,11 @@ const Title = styled.p`
 const CenterContainer = styled.div`
   position: absolute;
   top: 40%;
-  left: 42%;
+  left: 38%;
 `;
 
 const UploadIcon = styled(AiOutlineUpload)`
-  font-size: 4em;
+  font-size: 6em;
   color: black;
   cursor: pointer;
 
@@ -84,6 +84,10 @@ const ExternalLinkContainer = styled.div`
   & > *:hover {
     transform: scale(1.05);
   }
+
+  & > *:active {
+    color: black;
+  }
 `;
 
 const GithubIcon = styled(AiFillGithub)``;
@@ -96,6 +100,10 @@ const QuestionIcon = styled(AiFillQuestionCircle)`
   color: rgba(0, 0, 0, 0.6);
   &:hover {
     transform: scale(1.05);
+  }
+
+  &:active {
+    color: black;
   }
 `;
 
